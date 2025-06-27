@@ -1,0 +1,53 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Login</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+</head>
+<body class="h-screen w-full">
+<div class="flex items-center justify-end mr-10">
+    <a href="{{ request.META.HTTP_REFERER }}"
+       class="flex items-center text-blue-600 hover:text-blue-800 border-2 border-red-600 px-2 py-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-1">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
+        </svg>
+        Back
+    </a>
+</div>
+<div class="bg-white p-6 rounded shadow w-full bg-gray-100 flex flex-col items-center justify-center">
+    <h2 class="text-center font-bold text-2xl mb-4">Login as {{ role|capfirst }}</h2>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <p class="text-center text-red-500 text-sm font-semibold">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" class="space-y-3">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username"
+               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+               required>
+
+        <input type="password" name="password" placeholder="Password"
+               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+               required>
+
+        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded">
+            Login
+        </button>
+
+        <div class="flex justify-between items-center text-sm mt-2">
+            <a href="{% url 'user_register' %}" class="text-red-600 font-bold">Sign Up</a>
+            <a href="{% url 'password_reset' %}" class="text-blue-600 font-bold">Reset Password</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

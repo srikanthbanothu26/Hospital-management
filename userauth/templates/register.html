@@ -1,0 +1,20 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+</head>
+<body>
+<h2>Register</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button>
+</form>
+
+{% for message in messages %}
+<p style="color: red;">{{ message }}</p>
+{% endfor %}
+</body>
+</html>

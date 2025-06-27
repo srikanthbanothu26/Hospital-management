@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Bill{% endblock %}
+
+{% block main_content %}
+<main class="mt-24 bg-gray-100 min-h-screen w-full p-4 overflow-y-auto">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-red-600">Create Bill</h1>
+            <a href="{% url 'bills'%}" class="flex items-center text-blue-600 hover:text-blue-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-1">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
+                </svg>
+                Back
+            </a>
+        </div>
+
+        <!-- Patient Search Form -->
+        <form method="post" class="mb-6">
+            {% csrf_token %}
+            <label class="block text-sm font-medium text-gray-700 mb-1">Search Patient by Reference</label>
+            <div class="flex gap-3">
+                <input type="text" name="search_patient" placeholder="e.g., PA/2025/0001"
+                       class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                       value="{{ patient.reference|default:'' }}">
+                <button type="submit" name="search_submit"
+                        class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition">
+                    Search
+                </button>
+            </div>
+        </form>
+
+        <!-- Billing Form -->
+        {% if searched and patient %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="patient_id" value="{{ patient.id }}">
+
+            <!-- Patient Info -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="text-sm font-medium text-gray-700">Patient Name</label>
+                    <input type="text" readonly value="{{ patient.name }}"
+                           class="w-full border bg-gray-100 px-3 py-2 rounded mt-1">
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-700">Appointment Date</label>
+                    <input type="text" readonly value="{{ patient.datetime|date:'Y-m-d H:i' }}"
+                           class="w-full border bg-gray-100 px-3 py-2 rounded mt-1">
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="mb-6">
+                <label class="text-sm font-medium text-gray-700 mb-2 block">Bill Items</label>
+                <table class="w-full border text-sm">
+                    <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-2 text-left">Product</th>
+                        <th class="p-2 text-left">Amount</th>
+                        <th class="p-2 text-center">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="product-lines">
+                    <tr>
+                        <td class="p-2">
+                            <select name="product[]" class="w-full border px-2 py-1 rounded">
+                                {% for product in products %}
+                                <option value="{{ product.id }}" data-amount="{{ product.price }}">
+                                    {{ product.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td class="p-2">
+                            <input type="number" name="amount[]" class="w-full border px-2 py-1 rounded" readonly>
+                        </td>
+                        <td class="p-2 text-center">
+                            <button type="button" onclick="removeLine(this)" class="text-red-600 font-bold">
+                                &times;
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button type="button" onclick="addLine()"
+                        class="mt-3 bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 transition">
+                    + Add Item
+                </button>
+            </div>
+
+            <!-- Total Display -->
+            <div class="flex justify-end items-center mb-6">
+                <span class="text-lg font-semibold text-gray-700 mr-2">Total:</span>
+                <span id="total-amount" class="text-2xl font-bold text-red-700">0</span>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" name="bill_submit"
+                        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+                    Submit Bill
+                </button>
+            </div>
+        </form>
+        {% elif searched %}
+        <div class="text-center text-red-600 font-semibold mt-4">
+            No patient found with the given reference.
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function updateAmountFromSelect(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const amount = selectedOption.getAttribute("data-amount") || 0;
+        const amountInput = selectElement.closest('tr').querySelector('input[name="amount[]"]');
+        if (amountInput) {
+            amountInput.value = amount;
+        }
+        updateTotal();
+    }
+
+    function addLine() {
+        const tableBody = document.getElementById('product-lines');
+
+        const tr = document.createElement('tr');
+
+        // Product select
+        const td1 = document.createElement('td');
+        td1.className = 'p-2';
+        const select = document.createElement('select');
+        select.name = 'product[]';
+        select.className = 'w-full border px-2 py-1 rounded';
+
+        {% for product in products %}
+        const opt{{ forloop.counter }} = document.createElement('option');
+        opt{{ forloop.counter }}.value = '{{ product.id }}';
+        opt{{ forloop.counter }}.setAttribute('data-amount', '{{ product.price }}');
+        opt{{ forloop.counter }}.innerText = '{{ product.name }}';
+        select.appendChild(opt{{ forloop.counter }});
+        {% endfor %}
+
+        select.addEventListener('change', function () {
+            updateAmountFromSelect(this);
+        });
+
+        td1.appendChild(select);
+
+        // Amount input
+        const td2 = document.createElement('td');
+        td2.className = 'p-2';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.name = 'amount[]';
+        input.className = 'w-full border px-2 py-1 rounded';
+        input.readOnly = true;
+        td2.appendChild(input);
+
+        // Remove button
+        const td3 = document.createElement('td');
+        td3.className = 'p-2 text-center';
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'text-red-600 font-bold';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.onclick = function () {
+            removeLine(this);
+        };
+        td3.appendChild(removeBtn);
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+
+        tableBody.appendChild(tr);
+
+        updateAmountFromSelect(select);
+    }
+
+    function removeLine(btn) {
+        const row = btn.closest('tr');
+        const rows = document.querySelectorAll('#product-lines tr');
+        if (rows.length > 0) {
+            row.remove();
+            updateTotal();
+        }
+    }
+
+    function updateTotal() {
+        let total = 0;
+        document.querySelectorAll('input[name="amount[]"]').forEach(input => {
+            const value = parseFloat(input.value) || 0;
+            total += value;
+        });
+        document.getElementById('total-amount').textContent = total.toFixed(2);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('select[name="product[]"]').forEach(select => {
+            updateAmountFromSelect(select);
+            select.addEventListener('change', function () {
+                updateAmountFromSelect(this);
+            });
+        });
+        updateTotal();
+    });
+</script>
+{% endblock %}

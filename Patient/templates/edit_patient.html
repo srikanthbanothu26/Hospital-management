@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Patient</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+</head>
+<body class="bg-gray-100 h-screen w-screen flex items-center justify-center p-4">
+<form method="POST" class="bg-white shadow-xl rounded-2xl w-full space-y-2 p-4">
+    {% csrf_token %}
+    <div class="flex justify-between">
+        <div class="flex space-x-3 mt-6">
+            <h1 class="text-3xl font-bold">Edit Patient</h1>
+            <a href="{% url 'patient_pdf_preview' patient.id %}" target="_blank"
+               class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">Preview PDF</a>
+
+            <a href="{% url 'patient_pdf_download' patient.id %}"
+               class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Download PDF</a>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button type="submit"
+                    class="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                Update
+            </button>
+            <a href="{{ request.META.HTTP_REFERER }}"
+               class="inline-flex items-center text-blue-600 hover:text-blue-800 border-2 border-red-600 px-2 py-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-1">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
+                </svg>
+                Back
+            </a>
+
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+        <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Name</label>
+            <input type="text" name="name" value="{{ patient.name }}"
+                   class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                   required>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Date of Birth</label>
+            <input type="date" name="date_of_birth" value="{{ patient.date_of_birth|date:'Y-m-d' }}"
+                   class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Gender</label>
+            <select name="gender"
+                    class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <option value="">Select Gender</option>
+                {% for g in genders %}
+                <option value="{{ g.id }}" {% if patient.gender and g.id == patient.gender.id %}selected{% endif %}>
+                    {{ g.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Phone Number</label>
+            <input type="number" name="phone_number" value="{{ patient.phone_number }}"
+                   class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                   required>
+        </div>
+
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-600 mb-1">Address</label>
+            <textarea name="address" rows="3"
+                      class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400">{{ patient.address }}</textarea>
+        </div>
+
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-600 mb-1">Description</label>
+            <textarea name="desc" rows="3"
+                      class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400">{{ patient.desc }}</textarea>
+        </div>
+
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-600 mb-1">Appointment DateTime</label>
+            <input type="datetime-local" name="datetime" value="{{ patient.datetime|date:'Y-m-d\\TH:i' }}"
+                   class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                   required>
+        </div>
+    </div>
+
+</form>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+Home/*.pyc
+Home/migration/*.pyc
+hospitalmanagement/*.pyc
+Patient/*.pyc
+Patient/migrations/*.pyc
+venv/*
