@@ -30,7 +30,11 @@ SECRET_KEY = 'django-insecure-*aq+v@+i!1(xe^ge2zr@6f)=wj97^2ejm!0g4^%q6w$t_z+!+b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://historical-clownfish-srkm-b43b1f51.koyeb.app/", ' http://127.0.0.1:8000/', '127.0.0.1', ]
+ALLOWED_HOSTS = [
+    "historical-clownfish-srkm-b43b1f51.koyeb.app",
+    "127.0.0.1",
+    "localhost",
+]
 
 # Application definition
 
