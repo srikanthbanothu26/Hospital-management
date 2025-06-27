@@ -10,47 +10,92 @@
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="{% static 'images/logo.png' %}" type="image/x-icon">
-
-    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
           integrity="sha384-qf97I+0o3+D7fK2VFcFhJjRpKP5jWfD5zNhm1Tjo+T8TziqUDG+ThQo2rhJlF+8u" crossorigin="anonymous">
-
     {% block head_scripts %}{% endblock %}
 </head>
 
 <body class="bg-gray-100 text-gray-800">
 <!-- Header -->
-<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
+<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 flex flex-col">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between w-full">
         <!-- Logo & Title -->
         <a href="{% url 'index' %}" class="flex items-center gap-4">
-            <!--                <img src="{% static 'images/logo.png' %}" alt="Vaishnav Hospital Logo" class="w-14 h-14 rounded-full border border-gray-300 shadow-sm hidden sm:block">-->
-            <h1 class="text-xl sm:text-2xl font-bold leading-tight text-red-600 tracking-wide">
-                Vaishnav <span class="block sm:inline text-gray-800">Hospital</span>
-            </h1>
+            <img src="{% static 'images/logo.png' %}" alt="Vaishnav Hospital Logo"
+                 class="w-16 h-16 rounded-full border border-red-400 shadow-sm hidden sm:block">
+            <div class="flex flex-col">
+                <h1 class="text-3xl text-red-600 font-bold">Vaishnav Hospital
+                </h1>
+                <p class="bg-red-600 text-white text-center">MULTISPECILAITY</p>
+            </div>
         </a>
-
-        <!-- Navigation -->
-        <nav class="flex items-center space-x-6 text-sm sm:text-base">
-            {% if user.is_admin or user.is_superuser or user.is_staff %}
-            <a href="{% url 'patients' %}" class="flex items-center gap-1 hover:text-blue-600 transition">
-                <i class="fas fa-user-injured"></i> Patients
-            </a>
-            <a href="{% url 'bills'%}" class="flex items-center gap-1 hover:text-blue-600 transition">
-                Bills
-            </a>
-            {% endif %}
-
-            {% if user.is_authenticated %}
-            <div class="flex items-center gap-2 text-gray-700">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="h-16 w-30 text-red-600">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+                <div class="font-bold flex flex-col items-center space-x-2">
+                    <p class="text-2xl text-red-600">24/7 Hours</p>
+                    <p class="text-xl text-black">Ready to help</p>
+                </div>
+            </div>
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="h-14 w-30 text-red-600">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M20.25 3.75v4.5m0-4.5h-4.5m4.5 0-6 6m3 12c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z"/>
+                </svg>
+                <div class="text-gray-700 flex flex-col">
+                    <p class="text-red-500 mr-2">Contact</p>
+                    <a href="tel:+919390379057" class="hover:text-green-500 transition">+91-9390379057</a>
+                </div>
+            </div>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="flex flex-col">
+            <div class="flex items-center text-gray-700">
                 <i class="fas fa-user-circle text-lg"></i>
                 <span>{{ user.username }}</span>
             </div>
             <a href="{% url 'user_logout' %}"
                class="flex items-center gap-1 text-red-600 hover:text-red-800 transition">
-                <i class="fas fa-sign-out-alt"></i> Logout
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
             </a>
             {% endif %}
+        </div>
+        <!-- Navigation -->
+    </div>
+    <div class="flex justify-end w-full border-t-2 border-red-400 cursor-pointe pr-4r">
+        <nav class="flex items-center space-x-6 text-sm sm:text-base">
+            <a href="{% url 'index'%}" class="text-red-600 font-bold">Home
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'patients' %}" class="flex items-center gap-1 hover:text-blue-600 transition">
+                <i class="fas fa-user-injured"></i> Appointments
+            </a>
+            {% endif %}
+            {% if user.is_admin or user.is_superuser or user.is_staff %}
+            <a href="{% url 'bills'%}" class="flex items-center gap-1 hover:text-blue-600 transition">
+                Bills
+            </a>
+            {% endif %}
+            <a href="{% url 'create_patient'%}"
+               class="flex items-center gap-1 hover:bg-white hover:text-green-600 transition bg-red-600 text-white">Book
+                Appointment</a>
+            <div class="flex justify-center md:justify-start gap-4 items-center">
+                <a href="https://www.instagram.com/055_srikanth_2607/" target="_blank"
+                   class="flex items-center gap-2 text-pink-600 hover:text-pink-800 transition">
+                    <i class="fab fa-instagram text-xl"></i>
+                </a>
+                <a href="https://x.com/Srikanth_0nline/" target="_blank"
+                   class="flex items-center gap-2 text-blue-500 hover:text-blue-700 transition">
+                    <i class="fab fa-twitter text-xl"></i>
+                </a>
+            </div>
         </nav>
     </div>
 </header>

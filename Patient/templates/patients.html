@@ -6,7 +6,7 @@ Patients
 {% endblock %}
 
 {% block main_content %}
-<main class="mt-24 bg-red-50 min-h-screen w-full p-4 fixed">
+<main class="mt-24 bg-red-50 h-screen w-full p-10 fixed">
     <div class="bg-white shadow rounded-lg">
 
         <div class="flex justify-between items-center p-2 border-b">
@@ -76,7 +76,7 @@ Patients
                 <td class="p-2">{{ patient.address }}</td>
                 <td class="p-2">{{ patient.datetime|date:"Y-m-d H:i" }}</td>
                 <td class="p-2">
-                    <a href="{% url 'edit_patient' patient.id %}" class="text-blue-500 hover:underline">Edit</a>
+                    <a href="{% url 'edit_patient' patient.id %}" class="text-blue-500 hover:underline">View</a>
                 </td>
             </tr>
             {% empty %}

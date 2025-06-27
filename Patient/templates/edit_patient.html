@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Patient</title>
+    <title>View/Edit Appointment</title>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 </head>
 <body class="bg-gray-100 h-screen w-screen flex items-center justify-center p-4">
@@ -11,7 +11,7 @@
     {% csrf_token %}
     <div class="flex justify-between">
         <div class="flex space-x-3 mt-6">
-            <h1 class="text-3xl font-bold">Edit Patient</h1>
+            <h1 class="text-3xl font-bold">View/Edit Appointment</h1>
             <a href="{% url 'patient_pdf_preview' patient.id %}" target="_blank"
                class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">Preview PDF</a>
 
@@ -19,10 +19,23 @@
                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Download PDF</a>
         </div>
         <div class="flex items-center space-x-2">
+            {% if user.is_authenticated and user.is_superuser or user.is_staff %}
             <button type="submit"
                     class="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition">
                 Update
             </button>
+            {% endif %}
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="h-14 w-30 text-red-600">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M20.25 3.75v4.5m0-4.5h-4.5m4.5 0-6 6m3 12c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z"/>
+                </svg>
+                <div class="text-gray-700 flex flex-col">
+                    <p class="text-red-500 mr-2">Please Contact & Confirm Your Appointment</p>
+                    <a href="tel:+919390379057" class="hover:text-green-500 transition">+91-9390379057</a>
+                </div>
+            </div>
             <a href="{{ request.META.HTTP_REFERER }}"
                class="inline-flex items-center text-blue-600 hover:text-blue-800 border-2 border-red-600 px-2 py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

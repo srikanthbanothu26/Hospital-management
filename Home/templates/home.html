@@ -9,7 +9,7 @@ Vaishnav Hospital
 <main class="pt-28 bg-red-50 min-h-screen w-full">
     <!-- Departments Section -->
     <section class="container mx-auto px-6 mb-16">
-        <h1 class="text-3xl font-bold text-center mb-10 text-red-700">Our Medical Departments</h1>
+        <h1 class="text-3xl font-bold text-center mb-10 text-red-700">Our Medical Services</h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {% for department in departments %}
             <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6">
@@ -38,8 +38,5 @@ Vaishnav Hospital
     </section>
 </main>
 {% block form_content %}{% endblock %}
-{% endblock %}
-
-{% block scripts %}
 <!-- Optional: AOS animation or interactivity script can be added -->
 {% endblock %}

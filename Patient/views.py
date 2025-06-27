@@ -10,27 +10,32 @@ from django.utils import timezone
 
 
 def patients(request):
-    patients = Patient.objects.filter(user=request.user)
+    if request.user.is_authenticated:
+        user = User.objects.get(id=request.user.id)
+        if user.is_superuser:
+            patients = Patient.objects.all()
+        else:
+            patients = Patient.objects.filter(user=request.user)
 
-    from_date = request.GET.get('from_date')
-    to_date = request.GET.get('to_date')
-    name_query = request.GET.get('name')
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        name_query = request.GET.get('name')
 
-    if from_date:
-        patients = patients.filter(datetime__date__gte=from_date)
-    if to_date:
-        patients = patients.filter(datetime__date__lte=to_date)
-    if name_query:
-        patients = patients.filter(
-            Q(name__icontains=name_query) | Q(reference__icontains=name_query)
-        )
+        if from_date:
+            patients = patients.filter(datetime__date__gte=from_date)
+        if to_date:
+            patients = patients.filter(datetime__date__lte=to_date)
+        if name_query:
+            patients = patients.filter(
+                Q(name__icontains=name_query) | Q(reference__icontains=name_query)
+            )
 
-    patients = patients.order_by('-datetime')
+        patients = patients.order_by('-datetime')
 
-    return render(request, 'patients.html', {
-        'patients': patients,
-        'latest_appointment': patients.first() if patients.exists() else None,
-    })
+        return render(request, 'patients.html', {
+            'patients': patients,
+            'latest_appointment': patients.first() if patients.exists() else None,
+        })
 
 
 def create_patient(request):
