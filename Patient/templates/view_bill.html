@@ -40,45 +40,47 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Edit Bill Items</label>
                 <table class="w-full border text-sm">
                     <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-2 text-left">Product</th>
-                        <th class="p-2 text-left">Amount</th>
-                        <th class="p-2 text-center">Action</th>
-                    </tr>
+                        <tr>
+                            <th class="p-2 text-left">Product</th>
+                            <th class="p-2 text-left">Amount</th>
+                            <th class="p-2 text-center">Action</th>
+                        </tr>
                     </thead>
                     <tbody id="product-lines">
-                    {% for item in items %}
-                    <tr>
-                        <td class="p-2">
-                            <select name="product[]" class="w-full border px-2 py-1 rounded">
-                                {% for product in products %}
-                                <option value="{{ product.id }}" data-amount="{{ product.price }}"
-                                        {% if product.id== item.product.id %}selected{% endif %}>
-                                    {{ product.name }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                        <td class="p-2">
-                            <input type="number" name="amount[]" value="{{ item.amount }}"
-                                   readonly class="w-full border px-2 py-1 rounded">
-                        </td>
-                        <td class="p-2 text-center">
-                            <button type="button" onclick="removeLine(this)" class="text-red-600 font-bold">&times;
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
+                        {% for item in items %}
+                        <tr>
+                            <td class="p-2">
+                                <select name="product[]" class="w-full border px-2 py-1 rounded">
+                                    {% for product in products %}
+                                    <option value="{{ product.id }}" data-amount="{{ product.price }}"
+                                            {% if product.id == item.product.id %}selected{% endif %}>
+                                        {{ product.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="p-2">
+                                <input type="number" name="amount[]" value="{{ item.amount }}"
+                                       readonly class="w-full border px-2 py-1 rounded">
+                            </td>
+                            <td class="p-2 text-center">
+                                <button type="button" onclick="removeLine(this)" class="text-red-600 font-bold">&times;</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
+
                 <button type="button" onclick="addLine()"
-                        class="mt-2 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">+ Add Item
-                </button>
+                        class="mt-2 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">+ Add Item</button>
             </div>
 
+            <!-- Hidden total input to submit -->
+            <input type="hidden" name="total_amount" id="total-hidden">
+
+            <!-- Save Button -->
             <div class="text-center">
-                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Save Changes
-                </button>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Save Changes</button>
             </div>
         </form>
     </div>
@@ -96,33 +98,63 @@
     }
 
     function addLine() {
-        const row = document.querySelector('#product-lines tr');
-        const clone = row.cloneNode(true);
+        const tableBody = document.getElementById('product-lines');
+        const tr = document.createElement('tr');
 
-        const select = clone.querySelector('select');
-        const input = clone.querySelector('input[name="amount[]"]');
+        // Product select
+        const td1 = document.createElement('td');
+        td1.className = 'p-2';
+        const select = document.createElement('select');
+        select.name = 'product[]';
+        select.className = 'w-full border px-2 py-1 rounded';
 
-        input.value = "";
-        select.selectedIndex = 0;
+        {% for product in products %}
+        const opt{{ forloop.counter }} = document.createElement('option');
+        opt{{ forloop.counter }}.value = '{{ product.id }}';
+        opt{{ forloop.counter }}.setAttribute('data-amount', '{{ product.price }}');
+        opt{{ forloop.counter }}.innerText = '{{ product.name }}';
+        select.appendChild(opt{{ forloop.counter }});
+        {% endfor %}
 
-        // Bind event again
         select.addEventListener('change', function () {
             updateAmountFromSelect(this);
         });
+        td1.appendChild(select);
 
-        // Append and initialize
-        document.querySelector('#product-lines').appendChild(clone);
+        // Amount input
+        const td2 = document.createElement('td');
+        td2.className = 'p-2';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.name = 'amount[]';
+        input.className = 'w-full border px-2 py-1 rounded';
+        input.readOnly = true;
+        td2.appendChild(input);
+
+        // Remove button
+        const td3 = document.createElement('td');
+        td3.className = 'p-2 text-center';
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'text-red-600 font-bold';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.onclick = function () {
+            removeLine(this);
+        };
+        td3.appendChild(removeBtn);
+
+        // Append all
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tableBody.appendChild(tr);
+
         updateAmountFromSelect(select);
-        updateTotal();
     }
 
     function removeLine(btn) {
-        const row = btn.closest('tr');
-        const rows = document.querySelectorAll('#product-lines tr');
-        if (rows.length > 0) {
-            row.remove();
-            updateTotal();
-        }
+        btn.closest('tr').remove();
+        updateTotal();
     }
 
     function updateTotal() {
@@ -131,9 +163,16 @@
             const value = parseFloat(input.value) || 0;
             total += value;
         });
+
         const totalDisplay = document.getElementById('bill-total');
+        const totalHidden = document.getElementById('total-hidden');
+
         if (totalDisplay) {
             totalDisplay.value = `₹${total.toFixed(2)}`;
+        }
+
+        if (totalHidden) {
+            totalHidden.value = total.toFixed(2);
         }
     }
 

@@ -178,18 +178,23 @@ def view_bill(request, bill_id):
     items = BillItem.objects.filter(bill=bill)
 
     if request.method == "POST":
-        # Delete all existing bill items
+        # Delete old bill items
         bill.items.all().delete()
 
+        # Get product IDs and amounts from POST data
         product_ids = request.POST.getlist("product[]")
         amounts = request.POST.getlist("amount[]")
 
         total = 0
         for i in range(len(product_ids)):
+            if not product_ids[i]:
+                continue  # Skip empty lines
+
             product = get_object_or_404(Product, id=product_ids[i])
             amount = float(amounts[i]) if amounts[i] else 0
             total += amount
 
+            # Save each item
             BillItem.objects.create(
                 bill=bill,
                 product=product,
@@ -197,9 +202,18 @@ def view_bill(request, bill_id):
                 amount=amount
             )
 
+        # Update total amount (can also get from hidden input)
+        total_from_form = request.POST.get("total_amount")
+        if total_from_form:
+            try:
+                total = float(total_from_form)
+            except ValueError:
+                pass
+
         bill.total_amount = total
         bill.save()
-        return redirect('bills')
+
+        return redirect('bills')  # replace 'bills' with your actual URL name
 
     return render(request, 'view_bill.html', {
         'bill': bill,
