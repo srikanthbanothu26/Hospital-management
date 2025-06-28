@@ -24,4 +24,5 @@ urlpatterns = [
                   path('', include('Home.urls')),
                   path('user/', include('userauth.urls')),
                   path('patients/', include('Patient.urls')),
+                  path('payments/', include('Payments.urls')),
               ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)

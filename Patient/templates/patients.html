@@ -6,10 +6,11 @@ Patients
 {% endblock %}
 
 {% block main_content %}
-<main class="mt-24 bg-red-50 h-screen w-full p-10 fixed">
-    <div class="bg-white shadow rounded-lg">
+<main class="mt-24 h-[calc(100vh-6rem)] w-full px-10 py-10 overflow-hidden bg-red-50 fixed">
+    <div class="bg-white shadow rounded-lg h-full flex flex-col">
 
-        <div class="flex justify-between items-center p-2 border-b">
+        <!-- Header -->
+        <div class="flex justify-between items-center px-4 py-2 border-b">
             <h1 class="text-xl font-bold">Patients</h1>
             <div class="flex space-x-2">
                 <a href="{% url 'create_patient' %}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">New</a>
@@ -21,7 +22,7 @@ Patients
         </div>
 
         <!-- Filter Bar -->
-        <div class="flex flex-wrap items-center space-x-2 p-2 border-b bg-gray-50">
+        <div class="flex flex-wrap items-center space-x-2 px-4 py-2 border-b bg-gray-50">
             <label class="text-sm text-gray-700">From</label>
             <input type="date" id="from-date" name="from_date" value="{{ request.GET.from_date }}"
                    class="border rounded p-1">
@@ -41,76 +42,84 @@ Patients
 
         <!-- Latest Appointment -->
         {% if latest_appointment %}
-        <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded my-2">
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded mx-4 my-2">
             <strong>Latest Appointment:</strong>
             {{ latest_appointment.name }} on {{ latest_appointment.datetime|date:"Y-m-d H:i" }}
         </div>
         {% endif %}
 
-        <!-- Patient Table -->
-        <table class="min-w-full text-sm text-left">
-            <thead class="bg-gray-100">
-            <tr>
-                <th class="p-2"><input type="checkbox" id="select-all"></th>
-                <th class="p-2">Ref</th>
-                <th class="p-2">Name</th>
-                <th class="p-2">Gender</th>
-                <th class="p-2">Phone</th>
-                <th class="p-2">Address</th>
-                <th class="p-2">Appointment</th>
-                <th class="p-2">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for patient in patients %}
-            <tr class="border-b hover:bg-gray-200">
-                <td class="p-2"><input type="checkbox" class="row-checkbox" value="{{ patient.id }}"></td>
-                <td class="p-2">{{ patient.reference }}</td>
-                <td class="p-2">
-                    <a href="{% url 'edit_patient' patient.id %}" class="text-blue-400 hover:text-red-600">
-                        {{ patient.name }}
-                    </a>
-                </td>
-                <td class="p-2">{{ patient.gender.name }}</td>
-                <td class="p-2">{{ patient.phone_number }}</td>
-                <td class="p-2">{{ patient.address }}</td>
-                <td class="p-2">{{ patient.datetime|date:"Y-m-d H:i" }}</td>
-                <td class="p-2">
-                    <a href="{% url 'edit_patient' patient.id %}" class="text-blue-500 hover:underline">View</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7" class="p-4 text-center text-gray-500">No patients found.</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <!-- Table Scrollable -->
+        <div class="overflow-y-auto flex-1">
+            <table class="min-w-full text-sm text-left">
+                <thead class="bg-gray-100 sticky top-0 z-10">
+                <tr>
+                    <th class="p-2 sticky left-0 bg-gray-100">#</th>
+                    <th class="p-2"><input type="checkbox" id="select-all"></th>
+                    <th class="p-2">Ref</th>
+                    <th class="p-2">Name</th>
+                    <th class="p-2">Gender</th>
+                    <th class="p-2">Phone</th>
+                    <th class="p-2">Address</th>
+                    <th class="p-2">Appointment</th>
+                    <th class="p-2">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for patient in patients %}
+                <tr class="border-b hover:bg-gray-100">
+                    <td class="p-2 sticky left-0 bg-white z-10">{{ forloop.counter }}</td>
+                    <td class="p-2"><input type="checkbox" class="row-checkbox" value="{{ patient.id }}"></td>
+                    <td class="p-2">{{ patient.reference }}</td>
+                    <td class="p-2">
+                        <a href="{% url 'edit_patient' patient.id %}" class="text-blue-500 hover:text-red-600">
+                            {{ patient.name }}
+                        </a>
+                    </td>
+                    <td class="p-2">{{ patient.gender.name }}</td>
+                    <td class="p-2">{{ patient.phone_number }}</td>
+                    <td class="p-2">{{ patient.address }}</td>
+                    <td class="p-2">{{ patient.datetime|date:"Y-m-d H:i" }}</td>
+                    <td class="p-2">
+                        <a href="{% url 'edit_patient' patient.id %}" class="text-blue-600 hover:underline">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="p-4 text-center text-gray-500">No patients found.</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </main>
 {% endblock %}
 
 {% block scripts %}
 <script>
+    // Toggle select all checkboxes
     document.getElementById('select-all').addEventListener('change', function () {
         const checkboxes = document.querySelectorAll('.row-checkbox');
         checkboxes.forEach(cb => cb.checked = this.checked);
         toggleBulkDelete();
     });
 
+    // Toggle delete button visibility
     document.querySelectorAll('.row-checkbox').forEach(cb => {
         cb.addEventListener('change', toggleBulkDelete);
     });
 
     function toggleBulkDelete() {
         const anyChecked = document.querySelectorAll('.row-checkbox:checked').length > 0;
-        document.getElementById('bulk-delete-btn').style.display = anyChecked ? 'inline-block' : 'none';
+        const deleteBtn = document.getElementById('bulk-delete-btn');
+        deleteBtn.classList.toggle('hidden', !anyChecked);
     }
 
     function bulkDeletePatients() {
         const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
             .map(cb => cb.value)
             .join(',');
+
         if (!selectedIds) {
             alert("No patients selected");
             return;
@@ -128,6 +137,7 @@ Patients
         const name = document.getElementById('name-search').value;
 
         let url = new URL(window.location.href);
+
         if (fromDate) url.searchParams.set('from_date', fromDate);
         else url.searchParams.delete('from_date');
 

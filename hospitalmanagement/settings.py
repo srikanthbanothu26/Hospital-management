@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'Home',
     'userauth',
     'Patient',
+    'Payments',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +72,7 @@ TEMPLATES = [
             (os.path.join(BASE_DIR, 'Home', 'templates')),
             (os.path.join(BASE_DIR, 'userauth', 'templates')),
             (os.path.join(BASE_DIR, 'Patient', 'templates')),
+            (os.path.join(BASE_DIR, 'Payments', 'templates')),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

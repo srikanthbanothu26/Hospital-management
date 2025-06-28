@@ -3,13 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Vaishnav Hospital{% endblock %}</title>
+    {% for hospital in hospital %}
+    <title>{% block title %}
+        {{hospital.name}}
+        {% endblock %}</title>
 
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 
     <!-- Favicon -->
-    <link rel="shortcut icon" href="{% static 'images/logo.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{hospital.logo.url}}" type="image/x-icon">
+    {% endfor %}
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
           integrity="sha384-qf97I+0o3+D7fK2VFcFhJjRpKP5jWfD5zNhm1Tjo+T8TziqUDG+ThQo2rhJlF+8u" crossorigin="anonymous">
@@ -22,13 +26,15 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between w-full">
         <!-- Logo & Title -->
         <a href="{% url 'index' %}" class="flex items-center gap-4">
-            <img src="{% static 'images/logo.png' %}" alt="Vaishnav Hospital Logo"
+            {% for x in hospital %}
+            <img src="{{ x.logo.url }}" alt="{{x.name}}"
                  class="w-16 h-16 rounded-full border border-red-400 shadow-sm hidden sm:block">
             <div class="flex flex-col">
-                <h1 class="text-3xl text-red-600 font-bold">Vaishnav Hospital
+                <h1 class="text-3xl text-red-600 font-bold">{{x.name}}
                 </h1>
                 <p class="bg-red-600 text-white text-center">MULTISPECILAITY</p>
             </div>
+            {% endfor %}
         </a>
         <div class="flex items-center justify-between">
             <div class="flex items-center">
@@ -43,15 +49,19 @@
                 </div>
             </div>
             <div class="flex items-center">
+                {% for i in hospital %}
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                      stroke="currentColor" class="h-14 w-30 text-red-600">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M20.25 3.75v4.5m0-4.5h-4.5m4.5 0-6 6m3 12c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z"/>
                 </svg>
                 <div class="text-gray-700 flex flex-col">
+                    {% if i.contact %}
                     <p class="text-red-500 mr-2">Contact</p>
-                    <a href="tel:+919390379057" class="hover:text-green-500 transition">+91-9390379057</a>
+                    <a href="tel:{{i.contact.code}}{{i.contact.name}}" class="hover:text-green-500 transition">{{i.contact.code}}{{i.contact.name}}</a>
+                    {% endif %}
                 </div>
+                {% endfor %}
             </div>
         </div>
         {% if user.is_authenticated %}
@@ -83,19 +93,27 @@
                 Bills
             </a>
             {% endif %}
+            <a href="{% url 'payments' %}" class="flex items-center gap-1 hover:text-blue-600 transition">
+                Payments
+            </a>
             <a href="{% url 'create_patient'%}"
                class="flex items-center gap-1 hover:bg-white hover:text-green-600 transition bg-red-600 text-white">Book
                 Appointment</a>
+            <a href="{% url 'medicines'%}">
+                Medicines
+            </a>
+            {% for j in hospital %}
             <div class="flex justify-center md:justify-start gap-4 items-center">
-                <a href="https://www.instagram.com/055_srikanth_2607/" target="_blank"
+                <a href="{{j.instagram}}" target="_blank"
                    class="flex items-center gap-2 text-pink-600 hover:text-pink-800 transition">
                     <i class="fab fa-instagram text-xl"></i>
                 </a>
-                <a href="https://x.com/Srikanth_0nline/" target="_blank"
+                <a href="{{j.twitter}}" target="_blank"
                    class="flex items-center gap-2 text-blue-500 hover:text-blue-700 transition">
                     <i class="fab fa-twitter text-xl"></i>
                 </a>
             </div>
+            {% endfor %}
         </nav>
     </div>
 </header>

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if department %}Edit{% else %}Add{% endif %} Department{% endblock %}
+
+{% block main_content %}
+<main class="mt-24 bg-gray-100 min-h-screen p-4">
+    <div class="flex justify-end">
+        <a href="{{ request.META.HTTP_REFERER }}"
+           class="flex items-center text-blue-600 hover:text-blue-800 border-2 border-red-600 px-2 py-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
+            </svg>
+            Back
+        </a>
+    </div>
+    <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-8">
+        <h2 class="text-2xl font-bold text-center mb-6 text-blue-700">
+            {% if department %}Update Service{% else %}Add New Service{% endif %}
+        </h2>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Name Field -->
+            <div>
+                <label for="id_name" class="block text-gray-700 font-medium mb-2">Department Name</label>
+                <input type="text" name="name" id="id_name"
+                       value="{{ form.name.value|default_if_none:'' }}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 shadow-sm"
+                       placeholder="Enter department name">
+                {% if form.name.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Description Field -->
+            <div>
+                <label for="id_desc" class="block text-gray-700 font-medium mb-2">Description</label>
+                <textarea name="desc" id="id_desc" rows="4"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 shadow-sm"
+                          placeholder="Write a short description...">{{ form.desc.value|default_if_none:'' }}</textarea>
+                {% if form.desc.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.desc.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md shadow transition">
+                    {% if department %}Update{% else %}Save{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

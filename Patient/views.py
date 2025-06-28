@@ -10,6 +10,7 @@ from django.utils import timezone
 
 
 def patients(request):
+    hospital = Hospital.objects.all()
     if request.user.is_authenticated:
         user = User.objects.get(id=request.user.id)
         if user.is_superuser:
@@ -34,6 +35,7 @@ def patients(request):
 
         return render(request, 'patients.html', {
             'patients': patients,
+            'hospital': hospital,
             'latest_appointment': patients.first() if patients.exists() else None,
         })
 
@@ -107,8 +109,9 @@ def patient_pdf_download(request, patient_id):
 
 
 def Bills(request):
+    hospital = Hospital.objects.all()
     bills = Bill.objects.all().order_by('-date')
-    return render(request, 'bills.html', {'bills': bills})
+    return render(request, 'bills.html', {'bills': bills, 'hospital': hospital})
 
 
 def delete_bill(request, bill_id):
@@ -118,6 +121,7 @@ def delete_bill(request, bill_id):
 
 
 def create_bill(request):
+    hospital = Hospital.objects.all()
     products = Product.objects.all()
     patient = None
     searched = False
@@ -168,6 +172,7 @@ def create_bill(request):
         'products': products,
         'patient': patient,
         'searched': searched,
+        'hospital': hospital,
     })
 
 
@@ -176,6 +181,7 @@ def view_bill(request, bill_id):
     patient = bill.patient
     products = Product.objects.all()
     items = BillItem.objects.filter(bill=bill)
+    hospital = Hospital.objects.all()
 
     if request.method == "POST":
         # Delete old bill items
@@ -220,4 +226,5 @@ def view_bill(request, bill_id):
         'patient': patient,
         'products': products,
         'items': items,
+        'hospital': hospital,
     })

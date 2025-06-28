@@ -1,5 +1,5 @@
 from django import forms
-from .models import Doctors, Patient, Gender
+from .models import Doctors, Patient, Gender, Department, Product
 from django.contrib.auth.models import User
 
 
@@ -38,3 +38,32 @@ class PatientForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class DoctorForm(forms.ModelForm):
+    class Meta:
+        model = Doctors
+        fields = ['profile_image', 'name', 'display_name', 'gender', 'date_of_birth', 'specialization', 'salary',
+                  'experience', ]
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
+class DepartmentForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = ['name', 'desc']
+        widgets = {
+            'desc': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'price']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-input w-full'}),
+            'price': forms.NumberInput(attrs={'class': 'form-input w-full'}),
+        }
