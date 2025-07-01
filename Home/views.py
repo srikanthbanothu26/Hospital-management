@@ -30,7 +30,7 @@ def index(request):
             'form': form,
             'hospital': hospital,
         })
-    return render(request, 'usertype.html')
+    return render(request, 'usertype.html', {'Hospital': hospital})
 
 
 @superuser_required

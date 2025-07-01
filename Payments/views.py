@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from Home.models import *
 from decimal import Decimal
 from datetime import datetime
+from django.db.models import Sum
 
 
 def generate_payment_ref():
@@ -32,7 +33,7 @@ def create_payment(request, bill_id):
 
     if request.method == 'POST':
         method_name = request.POST.get('payment_method')
-        amount = request.POST.get('amount') or bill.total_amount
+        amount = request.POST.get('amount') or bill.amount
         amount = Decimal(amount)
 
         payment_method = PaymentMethod.objects.get(name=method_name.lower())
@@ -98,7 +99,9 @@ def create_payment(request, bill_id):
 def Payments(request):
     hospital = Hospital.objects.all()
     payments = Payment.objects.all()
+    total_sum = payments.aggregate(Sum('debit'))['debit__sum'] or 0
     return render(request, "payments.html", {
         'payments': payments,
         'hospital': hospital,
+        'total_sum': total_sum,
     })

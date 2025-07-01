@@ -7,6 +7,7 @@ from xhtml2pdf import pisa
 from Home.forms import *
 from django.db.models import Q
 from django.utils import timezone
+from django.db.models import Sum
 
 
 def patients(request):
@@ -111,7 +112,8 @@ def patient_pdf_download(request, patient_id):
 def Bills(request):
     hospital = Hospital.objects.all()
     bills = Bill.objects.all().order_by('-date')
-    return render(request, 'bills.html', {'bills': bills, 'hospital': hospital})
+    total_sum = bills.aggregate(Sum('amount'))['amount__sum'] or 0
+    return render(request, 'bills.html', {'bills': bills, 'hospital': hospital, 'total_sum': total_sum})
 
 
 def delete_bill(request, bill_id):
@@ -163,7 +165,7 @@ def create_bill(request):
                     amount=amount
                 )
 
-            bill.total_amount = total
+            bill.amount = total
             bill.save()
 
             return redirect('bills')
@@ -216,7 +218,7 @@ def view_bill(request, bill_id):
             except ValueError:
                 pass
 
-        bill.total_amount = total
+        bill.amount = total
         bill.save()
 
         return redirect('bills')  # replace 'bills' with your actual URL name

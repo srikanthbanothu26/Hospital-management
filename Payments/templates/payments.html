@@ -16,6 +16,7 @@
             <table class="min-w-full text-sm border border-gray-200">
                 <thead class="bg-gray-100 text-gray-700">
                 <tr>
+                    <th class="p-3 border">#</th>
                     <th class="p-3 border">Ref</th>
                     <th class="p-3 border">Bill ID</th>
                     <th class="p-3 border">Patient</th>
@@ -29,8 +30,9 @@
                 <tbody>
                 {% for payment in payments %}
                 <tr class="hover:bg-gray-50 border-b">
+                    <td class="p-3 border">{{ forloop.counter }}</td>
                     <td class="p-3 border text-blue-600 font-semibold">{{ payment.ref }}</td>
-                    <td class="p-3 border">#{{ payment.bill.id }}</td>
+                    <td class="p-3 border">{{ payment.bill.id }}</td>
                     <td class="p-3 border">{{ payment.patient.name }}</td>
                     <td class="p-3 border">{{ payment.date|date:"Y-m-d H:i" }}</td>
                     <td class="p-3 border">{{ payment.payment_method.display_name}}
@@ -51,6 +53,16 @@
                 </tr>
                 {% endfor %}
                 </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="6">
+                        Total
+                    </td>
+                    <td class="px-3 py-1 text-right text-gray-500">
+                        {{ total_sum }}
+                    </td>
+                </tr>
+                </tfoot>
             </table>
         </div>
     </div>

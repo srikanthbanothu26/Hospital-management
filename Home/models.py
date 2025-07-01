@@ -4,6 +4,16 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Country(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    code = models.CharField(max_length=10)
+    currency = models.CharField(max_length=10)
+    currency_symbol = models.CharField(max_length=10)
+
+    def __str__(self):
+        return f"{self.name},{self.code}"
+
+
 class Contact(models.Model):
     code = models.CharField(max_length=4, null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
@@ -20,6 +30,7 @@ class Hospital(models.Model):
     twitter = models.URLField(null=True, blank=True)
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
     logo = models.ImageField(null=True, blank=True, upload_to="static/images/")
+    country = models.ForeignKey('Country', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -35,6 +46,15 @@ class Gender(models.Model):
 class Department(models.Model):
     name = models.CharField(max_length=100)
     desc = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+
+class States(models.Model):
+    name = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    code = models.CharField(max_length=10, null=True, blank=True)
+    country = models.ForeignKey('Country', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -120,6 +140,17 @@ class Patient(models.Model):
         return 'N/A'
 
 
+class UsersInfo(models.Model):
+    name = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    profile_image = models.ImageField(upload_to="static/images/user_profiles/", null=True, blank=True)
+    country = models.ForeignKey('Country', on_delete=models.CASCADE, null=True, blank=True)
+    state = models.ForeignKey('States', on_delete=models.CASCADE, null=True, blank=True)
+    profession = models.ForeignKey('Profession', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.name.username
+
+
 class Chatter(models.Model):
     patient = models.ForeignKey('Patient', on_delete=models.CASCADE, related_name='chatters')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -145,12 +176,9 @@ class Bill(models.Model):
     ]
     patient = models.ForeignKey('Patient', on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
-    tota_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     status = models.CharField(max_length=10, choices=bill_status, default='draft')
-
-    def total_amount(self):
-        self.tota_amount = sum(item.product.price for item in self.items.all())
-        return sum(item.product.price for item in self.items.all())
+    hospital = models.ForeignKey('Hospital', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"Bill #{self.id} for {self.patient.name}"
@@ -161,6 +189,7 @@ class BillItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    hospital = models.ForeignKey('Hospital', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"{self.product.name} in Bill #{self.bill.id}"
@@ -185,6 +214,7 @@ class CreditAccount(models.Model):
 class UpiPayments(models.Model):
     name = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    hospital = models.ForeignKey('Hospital', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -214,6 +244,7 @@ class Payment(models.Model):
     status = models.CharField(max_length=10, choices=payment_status, default='not_paid')
     debit_account = models.ForeignKey('DebitAccount', on_delete=models.CASCADE, null=True, blank=True)
     credit_account = models.ForeignKey('CreditAccount', on_delete=models.CASCADE, null=True, blank=True)
+    hospital = models.ForeignKey('Hospital', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.ref

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import Department, Doctors, Staff, Profession, Patient, Gender, Product, Bill, BillItem, Payment, \
-    PaymentMethod, UpiPayments, DebitAccount, CreditAccount, Hospital, Contact
+    PaymentMethod, UpiPayments, DebitAccount, CreditAccount, Hospital, Contact, Country, UsersInfo, States
 from .forms import DoctorsForm
 
 
@@ -38,3 +38,6 @@ admin.site.register(PaymentMethod)
 admin.site.register(UpiPayments)
 admin.site.register(DebitAccount)
 admin.site.register(CreditAccount)
+admin.site.register(Country)
+admin.site.register(UsersInfo)
+admin.site.register(States)

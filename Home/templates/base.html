@@ -64,8 +64,8 @@
                 {% endfor %}
             </div>
         </div>
-        {% if user.is_authenticated %}
         <div class="flex flex-col">
+            {% if user.is_authenticated %}
             <div class="flex items-center text-gray-700">
                 <i class="fas fa-user-circle text-lg"></i>
                 <span>{{ user.username }}</span>
@@ -76,6 +76,12 @@
                 Logout
             </a>
             {% endif %}
+            {% for x in hospital %}
+            <div class="text-red-500">
+                {{x.country.name}},
+                {{x.country.code}}
+            </div>
+            {% endfor %}
         </div>
         <!-- Navigation -->
     </div>
@@ -87,7 +93,6 @@
             <a href="{% url 'patients' %}" class="flex items-center gap-1 hover:text-blue-600 transition">
                 <i class="fas fa-user-injured"></i> Appointments
             </a>
-            {% endif %}
             {% if user.is_admin or user.is_superuser or user.is_staff %}
             <a href="{% url 'bills'%}" class="flex items-center gap-1 hover:text-blue-600 transition">
                 Bills
@@ -114,6 +119,7 @@
                 </a>
             </div>
             {% endfor %}
+            {% endif %}
         </nav>
     </div>
 </header>

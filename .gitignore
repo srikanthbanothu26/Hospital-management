@@ -18,3 +18,7 @@
 /Payments/migrations/__pycache__/
 /Payments/migrations/*.pyc
 /venv/
+app.py
+country.csv
+country_state.py
+country_state.csv
