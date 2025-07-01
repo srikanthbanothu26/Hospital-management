@@ -68,7 +68,7 @@
             {% if user.is_authenticated %}
             <div class="flex items-center text-gray-700">
                 <i class="fas fa-user-circle text-lg"></i>
-                <span>{{ user.username }}</span>
+                <a href="{% url 'user_info' user.id%}">{{ user.username }}</a>
             </div>
             <a href="{% url 'user_logout' %}"
                class="flex items-center gap-1 text-red-600 hover:text-red-800 transition">

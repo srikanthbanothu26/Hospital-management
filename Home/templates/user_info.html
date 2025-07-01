@@ -1,0 +1,53 @@
+{% load static %}
+<html>
+<head>
+    <title>User Info</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Edit Your Profile</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.profile_image.label_tag }} {{ form.profile_image }}<br><br>
+
+        {{ form.country.label_tag }} {{ form.country }}<br><br>
+
+        <label for="id_state">State</label>
+        <select name="state" id="id_state" class="form-select">
+            {% if form.instance.state %}
+                <option value="{{ form.instance.state.id }}">{{ form.instance.state.name }}</option>
+            {% else %}
+                <option value="">Select a state</option>
+            {% endif %}
+        </select><br><br>
+
+        {{ form.profession.label_tag }} {{ form.profession }}<br><br>
+
+        <button type="submit">Save</button>
+    </form>
+
+    <script>
+        $(document).ready(function () {
+            $('#id_country').change(function () {
+                let countryId = $(this).val();
+
+                $.ajax({
+                    url: "{% url 'get_states' %}",
+                    data: {
+                        'country_id': countryId
+                    },
+                    success: function (data) {
+                        let stateSelect = $('#id_state');
+                        stateSelect.empty();
+                        stateSelect.append('<option value="">Select a state</option>');
+                        data.states.forEach(function (state) {
+                            stateSelect.append(`<option value="${state.id}">${state.name}</option>`);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import *
 from .forms import *
+from django.http import JsonResponse
 
 
 def superuser_required(view_func):
@@ -128,3 +129,41 @@ def delete_medicine(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     product.delete()
     return redirect('medicines')
+
+
+def get_states(request):
+    country_id = request.GET.get('country_id')
+    print("Requested Country ID:", country_id)
+
+    states = States.objects.filter(country_id=country_id).values('id', 'name')
+    return JsonResponse({'states': list(states)})
+
+
+def user_info_view(request, user_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    # Allow access if admin OR the current user matches the user_id
+    if not (request.user.is_superuser or request.user.id == int(user_id)):
+        return HttpResponseForbidden("❌ You are not authorized to access this profile.")
+
+    user_obj = get_object_or_404(User, id=user_id)
+    user_info, created = UsersInfo.objects.get_or_create(name=user_obj)
+
+    if request.method == 'POST':
+        form = UsersInfoForm(request.POST, request.FILES, instance=user_info)
+        state_id = request.POST.get('state')
+        if form.is_valid():
+            updated_user_info = form.save(commit=False)
+            if state_id:
+                updated_user_info.state_id = state_id
+            updated_user_info.save()
+            return redirect('index')  # stay on the same user's profile
+    else:
+        form = UsersInfoForm(instance=user_info)
+
+    return render(request, 'user_info.html', {
+        'form': form,
+        'user_info': user_info,
+        'viewing_user': user_obj  # to show "Profile of {{ viewing_user.username }}" in template
+    })

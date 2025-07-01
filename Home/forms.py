@@ -1,5 +1,5 @@
 from django import forms
-from .models import Doctors, Patient, Gender, Department, Product
+from .models import Doctors, Patient, Gender, Department, Product, UsersInfo
 from django.contrib.auth.models import User
 
 
@@ -67,3 +67,9 @@ class ProductForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-input w-full'}),
             'price': forms.NumberInput(attrs={'class': 'form-input w-full'}),
         }
+
+
+class UsersInfoForm(forms.ModelForm):
+    class Meta:
+        model = UsersInfo
+        fields = ['profile_image', 'country', 'profession']
