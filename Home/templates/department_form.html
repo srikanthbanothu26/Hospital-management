@@ -21,7 +21,7 @@
             {% if department %}Update Service{% else %}Add New Service{% endif %}
         </h2>
 
-        <form method="POST" class="space-y-6">
+        <form method="POST" class="space-y-6" enctype="multipart/form-data">
             {% csrf_token %}
 
             <!-- Name Field -->
@@ -45,6 +45,10 @@
                 {% if form.desc.errors %}
                 <p class="text-red-600 text-sm mt-1">{{ form.desc.errors.0 }}</p>
                 {% endif %}
+            </div>
+
+            <div>
+                {{form.image}}
             </div>
 
             <!-- Submit Button -->

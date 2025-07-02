@@ -7,13 +7,11 @@
     <title>{% block title %}
         {{hospital.name}}
         {% endblock %}</title>
-
-    <!-- Tailwind CSS -->
-
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{hospital.logo.url}}" type="image/x-icon">
     {% endfor %}
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
           integrity="sha384-qf97I+0o3+D7fK2VFcFhJjRpKP5jWfD5zNhm1Tjo+T8TziqUDG+ThQo2rhJlF+8u" crossorigin="anonymous">
@@ -30,9 +28,9 @@
             <img src="{{ x.logo.url }}" alt="{{x.name}}"
                  class="w-16 h-16 rounded-full border border-red-400 shadow-sm hidden sm:block">
             <div class="flex flex-col">
-                <h1 class="text-3xl text-red-600 font-bold">{{x.name}}
+                <h1 class="text-3xl text-red-600 font-bold">{{x.name.capitalize}}
                 </h1>
-                <p class="bg-red-600 text-white text-center">MULTISPECILAITY</p>
+                <p class="bg-red-600 text-white text-center">{{x.objective.upper}}</p>
             </div>
             {% endfor %}
         </a>
@@ -89,6 +87,12 @@
         <nav class="flex items-center space-x-6 text-sm sm:text-base">
             <a href="{% url 'index'%}" class="text-red-600 font-bold">Home
             </a>
+            <a href="{% url 'departments_list'%}">
+                Services
+            </a>
+            <a href="{% url 'specialists_list'%}">
+                Specialists
+            </a>
             {% if user.is_authenticated %}
             <a href="{% url 'patients' %}" class="flex items-center gap-1 hover:text-blue-600 transition">
                 <i class="fas fa-user-injured"></i> Appointments
@@ -106,6 +110,9 @@
                 Appointment</a>
             <a href="{% url 'medicines'%}">
                 Medicines
+            </a>
+            <a href="{% url 'professions'%}">
+                Professions
             </a>
             {% for j in hospital %}
             <div class="flex justify-center md:justify-start gap-4 items-center">

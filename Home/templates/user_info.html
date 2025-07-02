@@ -1,53 +1,67 @@
+{% extends 'base.html' %}
 {% load static %}
-<html>
-<head>
-    <title>User Info</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <h2>Edit Your Profile</h2>
-
-    <form method="POST" enctype="multipart/form-data">
+{% block main_content %}
+<main class="flex items-center justify-center w-full h-screen fixed">
+    <form method="POST" enctype="multipart/form-data" class="flex gap-4 items-center justify-center w-full">
         {% csrf_token %}
-        {{ form.profile_image.label_tag }} {{ form.profile_image }}<br><br>
-
-        {{ form.country.label_tag }} {{ form.country }}<br><br>
-
-        <label for="id_state">State</label>
-        <select name="state" id="id_state" class="form-select">
-            {% if form.instance.state %}
-                <option value="{{ form.instance.state.id }}">{{ form.instance.state.name }}</option>
-            {% else %}
-                <option value="">Select a state</option>
+        <div class="flex flex-col justify-center gap-4">
+            <div class="flex gap-2">
+                <p class="text-red-600">{{ form.country.label_tag }}</p>
+                {{ form.country }}
+            </div>
+            <div class="flex gap-2">
+                <label for="id_state" class="text-red-600">State:</label>
+                <select name="state" id="id_state" class="form-select">
+                    {% if form.instance.state %}
+                    <option value="{{ form.instance.state.id }}">{{ form.instance.state.name }}</option>
+                    {% else %}
+                    <option value="">Select a state</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <p class="text-red-600">{{ form.city.label_tag }}</p>
+                {{ form.city }}
+            </div>
+            <div class="flex gap-2">
+                <p class="text-red-600">{{ form.profession.label_tag }} </p>
+                {{ form.profession }}
+            </div>
+            <button type="submit" class="px-4 py-2 bg-red-600 text-white">Save</button>
+        </div>
+        <div class="flex flex-col justify-center gap-4">
+            {% if form.instance.profile_image %}
+            <div class="">
+                <img src="{{ form.instance.profile_image.url }}" alt="Profile Image"
+                     class="h-96 w-64 object-cover rounded-md mb-4 border-2 border-red-300 shadow">
+            </div>
             {% endif %}
-        </select><br><br>
-
-        {{ form.profession.label_tag }} {{ form.profession }}<br><br>
-
-        <button type="submit">Save</button>
+            <div class="flex flex-col text-sm">
+                {{ form.profile_image }}
+            </div>
+        </div>
     </form>
+</main>
+<script>
+    $(document).ready(function () {
+        $('#id_country').change(function () {
+            let countryId = $(this).val();
 
-    <script>
-        $(document).ready(function () {
-            $('#id_country').change(function () {
-                let countryId = $(this).val();
-
-                $.ajax({
-                    url: "{% url 'get_states' %}",
-                    data: {
-                        'country_id': countryId
-                    },
-                    success: function (data) {
-                        let stateSelect = $('#id_state');
-                        stateSelect.empty();
-                        stateSelect.append('<option value="">Select a state</option>');
-                        data.states.forEach(function (state) {
-                            stateSelect.append(`<option value="${state.id}">${state.name}</option>`);
-                        });
-                    }
-                });
+            $.ajax({
+                url: "{% url 'get_states' %}",
+                data: {
+                    'country_id': countryId
+                },
+                success: function (data) {
+                    let stateSelect = $('#id_state');
+                    stateSelect.empty();
+                    stateSelect.append('<option value="">Select a state</option>');
+                    data.states.forEach(function (state) {
+                        stateSelect.append(`<option value="${state.id}">${state.name}</option>`);
+                    });
+                }
             });
         });
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock%}

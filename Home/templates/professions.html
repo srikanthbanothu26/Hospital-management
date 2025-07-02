@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main_content %}
+<div class="p-4 mt-28">
+    <a href="{% url 'create_profession' %}">
+        New
+    </a>
+    {% for x in professions %}
+    <div class="mb-2">
+        <a href="{% url 'profession_detail' x.id %}" class="text-blue-500 hover:underline">{{ x.name }}</a>
+    </div>
+    {% empty %}
+    <p>No professions found.</p>
+    {% endfor %}
+</div>
+{% endblock %}

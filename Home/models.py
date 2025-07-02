@@ -11,7 +11,7 @@ class Country(models.Model):
     currency_symbol = models.CharField(max_length=10)
 
     def __str__(self):
-        return f"{self.name},{self.code}"
+        return f"{self.name}"
 
 
 class Contact(models.Model):
@@ -24,6 +24,7 @@ class Contact(models.Model):
 
 class Hospital(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
+    objective = models.TextField(null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     instagram = models.URLField(null=True, blank=True)
@@ -46,6 +47,7 @@ class Gender(models.Model):
 class Department(models.Model):
     name = models.CharField(max_length=100)
     desc = models.TextField()
+    image = models.ImageField(null=True, blank=True, upload_to="static/images/services/")
 
     def __str__(self):
         return self.name
@@ -145,6 +147,7 @@ class UsersInfo(models.Model):
     profile_image = models.ImageField(upload_to="static/images/user_profiles/", null=True, blank=True)
     country = models.ForeignKey('Country', on_delete=models.CASCADE, null=True, blank=True)
     state = models.ForeignKey('States', on_delete=models.CASCADE, null=True, blank=True)
+    city = models.CharField(null=True, blank=True, max_length=300)
     profession = models.ForeignKey('Profession', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):

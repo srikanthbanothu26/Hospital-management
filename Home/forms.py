@@ -1,6 +1,7 @@
 from django import forms
-from .models import Doctors, Patient, Gender, Department, Product, UsersInfo
+from .models import Doctors, Patient, Gender, Department, Product, UsersInfo, Profession
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 
 class DoctorsForm(forms.ModelForm):
@@ -53,10 +54,16 @@ class DoctorForm(forms.ModelForm):
 class DepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
-        fields = ['name', 'desc']
+        fields = ['name', 'desc', 'image']
         widgets = {
             'desc': forms.Textarea(attrs={'rows': 3}),
         }
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image and not image.content_type in ['image/jpeg', 'image/png', 'image/webp']:
+            raise ValidationError("Unsupported image format. Please upload JPEG, PNG, or WebP.")
+        return image
 
 
 class ProductForm(forms.ModelForm):
@@ -72,4 +79,10 @@ class ProductForm(forms.ModelForm):
 class UsersInfoForm(forms.ModelForm):
     class Meta:
         model = UsersInfo
-        fields = ['profile_image', 'country', 'profession']
+        fields = ['profile_image', 'country', 'city', 'profession']
+
+
+class ProfessionForm(forms.ModelForm):
+    class Meta:
+        model = Profession
+        fields = ['name', ]

@@ -13,7 +13,7 @@ def index(request):
     genders = Gender.objects.all()
     hospital = Hospital.objects.all()
     if request.user.is_authenticated:
-        departments = Department.objects.all()
+        departments = Department.objects.filter(image__isnull=False).exclude(image='')
         doctors = Doctors.objects.all()
 
         if request.method == "POST":
@@ -51,14 +51,40 @@ def create_department(request):
 def update_department(request, department_id):
     hospital = Hospital.objects.all()
     department = get_object_or_404(Department, id=department_id)
+
     if request.method == 'POST':
-        form = DepartmentForm(request.POST, instance=department)
+        form = DepartmentForm(request.POST, request.FILES, instance=department)
         if form.is_valid():
             form.save()
-            return redirect('index')
+            return redirect('departments_list')
     else:
         form = DepartmentForm(instance=department)
-    return render(request, 'department_form.html', {'form': form, 'department': department, 'hospital': hospital})
+
+    return render(request, 'department_form.html', {
+        'form': form,
+        'department': department,
+        'hospital': hospital
+    })
+
+
+def departments_list(request):
+    departments = Department.objects.all()
+    hospital = Hospital.objects.all()
+    return render(request, 'services.html', {'departments': departments, 'hospital': hospital})
+
+
+def delete_department(request, department_id):
+    department = get_object_or_404(Department, id=department_id)
+    department.delete()
+    return redirect('departments_list')
+
+
+def bulk_delete_departments(request):
+    ids = request.GET.get('ids', '')
+    if ids:
+        id_list = [int(id) for id in ids.split(',') if id.isdigit()]
+        Department.objects.filter(id__in=id_list).delete()
+    return redirect('departments_list')
 
 
 @login_required
@@ -82,10 +108,30 @@ def update_doctor(request, doctor_id):
         form = DoctorForm(request.POST, request.FILES, instance=doctor)
         if form.is_valid():
             form.save()
-            return redirect('index')  # or any page
+            return redirect('specialists_list')  # or any page
     else:
         form = DoctorForm(instance=doctor)
     return render(request, 'doctors_form.html', {'form': form, 'doctor': doctor, 'hospital': hospital})
+
+
+def specialists_list(request):
+    doctors = Doctors.objects.all()
+    hospital = Hospital.objects.all()
+    return render(request, 'specialists.html', {'specialists': doctors, 'hospital': hospital})
+
+
+def delete_doctor(request, doctor_id):
+    doctor = get_object_or_404(Doctors, id=doctor_id)
+    doctor.delete()
+    return redirect('specialists_list')
+
+
+def bulk_delete_doctors(request):
+    ids = request.GET.get('ids', '')
+    if ids:
+        id_list = [int(id) for id in ids.split(',') if id.isdigit()]
+        Doctors.objects.filter(id__in=id_list).delete()
+    return redirect('specialists_list')
 
 
 @login_required
@@ -140,6 +186,7 @@ def get_states(request):
 
 
 def user_info_view(request, user_id):
+    hospital = Hospital.objects.all()
     if not request.user.is_authenticated:
         return redirect('login')
 
@@ -165,5 +212,48 @@ def user_info_view(request, user_id):
     return render(request, 'user_info.html', {
         'form': form,
         'user_info': user_info,
-        'viewing_user': user_obj  # to show "Profile of {{ viewing_user.username }}" in template
+        'viewing_user': user_obj,
+        'hospital': hospital,  # to show "Profile of {{ viewing_user.username }}" in template
+    })
+
+
+def profession_list(request):
+    professions = Profession.objects.all()
+    hospital = Hospital.objects.all()
+    return render(request, 'professions.html', {'professions': professions, 'hospital': hospital})
+
+
+def profession_detail(request, profession_id):
+    hospital = Hospital.objects.all()
+    profession = get_object_or_404(Profession, id=profession_id)
+
+    if request.method == 'POST':
+        form = ProfessionForm(request.POST, instance=profession)
+        if form.is_valid():
+            form.save()
+            return redirect('professions')
+    else:
+        form = ProfessionForm(instance=profession)
+
+    return render(request, 'profession_detail.html', {
+        'form': form,
+        'profession': profession,
+        'hospital': hospital
+    })
+
+
+def create_profession(request):
+    hospital = Hospital.objects.all()
+
+    if request.method == 'POST':
+        form = ProfessionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('professions')
+    else:
+        form = ProfessionForm()
+
+    return render(request, 'profession_detail.html', {
+        'form': form,
+        'hospital': hospital
     })

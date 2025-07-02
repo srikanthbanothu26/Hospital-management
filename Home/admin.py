@@ -6,7 +6,7 @@ from .forms import DoctorsForm
 
 
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'desc')
+    list_display = ('name', 'desc', 'image')
 
 
 class DoctorAdmin(admin.ModelAdmin):
