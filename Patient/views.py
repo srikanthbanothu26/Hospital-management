@@ -122,6 +122,14 @@ def delete_bill(request, bill_id):
     return redirect('bills')
 
 
+def bulk_delete_bills(request):
+    ids = request.GET.get('ids', '')
+    if ids:
+        id_list = [int(id) for id in ids.split(',') if id.isdigit()]
+        Bill.objects.filter(id__in=id_list).delete()
+    return redirect('bills')
+
+
 def create_bill(request):
     hospital = Hospital.objects.all()
     products = Product.objects.all()

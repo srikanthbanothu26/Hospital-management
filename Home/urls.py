@@ -2,7 +2,7 @@ from django.urls import path
 from .views import index, create_doctor, update_doctor, create_department, update_department, medicines, \
     create_medicine, update_medicine, delete_medicine, user_info_view, get_states, create_profession, profession_list, \
     profession_detail, departments_list, delete_department, bulk_delete_departments, specialists_list, \
-    bulk_delete_doctors, delete_doctor
+    bulk_delete_doctors, delete_doctor, delete_profession
 
 urlpatterns = [
     path('', index, name='index'),
@@ -22,6 +22,7 @@ urlpatterns = [
     path('profession/<int:profession_id>/', profession_detail, name='profession_detail'),
     path('profession/create/', create_profession, name='create_profession'),
     path('professions/', profession_list, name='professions'),
+    path('profession/<int:profession_id>/delete/', delete_profession, name='delete_profession'),
     path('departments_list/', departments_list, name='departments_list'),
     path('departments/<int:department_id>/delete/', delete_department, name='delete_department'),
     path('departments/bulk-delete/', bulk_delete_departments, name='bulk_delete_departments'),

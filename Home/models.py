@@ -25,6 +25,8 @@ class Contact(models.Model):
 class Hospital(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     objective = models.TextField(null=True, blank=True)
+    description1 = models.TextField(null=True, blank=True)
+    description2 = models.TextField(null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     instagram = models.URLField(null=True, blank=True)

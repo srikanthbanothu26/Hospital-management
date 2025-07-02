@@ -257,3 +257,10 @@ def create_profession(request):
         'form': form,
         'hospital': hospital
     })
+
+
+def delete_profession(request, profession_id):
+    profession = get_object_or_404(Profession, id=profession_id)
+    profession.delete()
+    messages.success(request, "Profession deleted successfully.")
+    return redirect('professions')
