@@ -6,7 +6,15 @@
 {% block main_content %}
 <main class="mt-24 bg-red-50 min-h-screen w-full p-4">
     <div class="bg-white shadow rounded-lg">
-
+        <div class="flex justify-end mr-4 pt-2">
+            <a href="">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                </svg>
+            </a>
+        </div>
         <!-- Header -->
         <div class="flex justify-between items-center p-4 border-b">
             <h1 class="text-xl font-bold text-red-700">Patient Bills</h1>
@@ -21,6 +29,25 @@
             </div>
         </div>
 
+        <!-- Search Form -->
+        <form method="get" class="flex flex-wrap gap-3 p-4 bg-gray-50 border-b">
+            <input type="text" name="search" placeholder="Search by name or reference"
+                   value="{{ search_query }}"
+                   class="border px-3 py-2 rounded w-64"/>
+
+            <input type="date" name="from_date" value="{{ from_date }}"
+                   class="border px-3 py-2 rounded"/>
+
+            <input type="date" name="to_date" value="{{ to_date }}"
+                   class="border px-3 py-2 rounded"/>
+
+            <button type="submit"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Filter
+            </button>
+        </form>
+
+
         <!-- Table -->
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm text-left">
@@ -30,8 +57,9 @@
                     <th class="p-2"><input type="checkbox" id="select-all"></th>
                     <th class="p-2 border">Bill ID</th>
                     <th class="p-2 border">Patient</th>
-                    <th class="p-2 border">Reference</th>
+                    <th class="p-2 border">Patient Reference</th>
                     <th class="p-2 border">Appointment</th>
+                    <th class="p-2 border">Bill Date</th>
                     <th class="p-2 border">Total</th>
                     <th class="p-2 border">Status</th>
                     <th class="p-2 border">Actions</th>
@@ -47,9 +75,14 @@
                             {{ bill.id }}
                         </a>
                     </td>
-                    <td class="p-2 border">{{ bill.patient.name }}</td>
+                    <td class="p-2 border">
+                        <a href="{% url 'view_bill' bill.id %}" class="text-blue-600 hover:underline">
+                            {{ bill.patient.name }}
+                        </a>
+                    </td>
                     <td class="p-2 border">{{ bill.patient.reference }}</td>
                     <td class="p-2 border">{{ bill.patient.datetime|date:"Y-m-d H:i" }}</td>
+                    <td class="p-2 border">{{ bill.date }}</td>
                     <td class="p-2 border font-semibold text-green-700">
                         {% for x in hospital %}
                         {{ x.country.currency_symbol }}
@@ -86,7 +119,7 @@
                 <!-- Footer Total -->
                 <tfoot class="bg-gray-50 font-semibold">
                 <tr>
-                    <td colspan="6" class="text-right p-2">Total:</td>
+                    <td colspan="7" class="text-right p-2">Total:</td>
                     <td class="text-red-600 p-2">
                         {% for x in hospital %}
                         {{ x.country.currency_symbol }}

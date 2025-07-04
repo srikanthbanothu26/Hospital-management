@@ -6,9 +6,37 @@
 {% block main_content %}
 <main class="mt-24 bg-gray-100 min-h-screen p-6">
     <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-end">
+            <a href="">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                </svg>
+            </a>
+        </div>
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-green-600">All Payments</h1>
         </div>
+        <!-- Filters -->
+        <form method="get" class="grid grid-cols-2 p-4 bg-gray-50 border-b">
+            <input type="text" name="search" placeholder="Search by patient name or payment reference"
+                   value="{{ search_query }}"
+                   class="border px-3 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-gray-300">
+            <div>
+                <input type="date" name="from_date" value="{{ from_date }}"
+                       class="border px-3 py-2 rounded"/>
+
+                <input type="date" name="to_date" value="{{ to_date }}"
+                       class="border px-3 py-2 rounded"/>
+
+                <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Filter
+                </button>
+            </div>
+        </form>
+
 
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm border border-gray-200">
@@ -35,8 +63,15 @@
                     <td class="p-3 border">{{ payment.date|date:"Y-m-d H:i" }}</td>
                     <td class="p-3 border">{{ payment.payment_method.display_name}}
                     </td>
-                    <td class="p-3 border text-right text-green-600">₹{{ payment.debit }}</td>
-                    <td class="p-3 border text-right text-red-600">₹{{ payment.credit }}</td>
+                    <td class="p-3 border text-right text-green-600">{% for x in hospital %}
+                        {{ x.country.currency_symbol }}
+                        {% endfor %}
+                        {{ payment.debit }}
+                    </td>
+                    <td class="p-3 border text-right text-red-600">{% for x in hospital %}
+                        {{ x.country.currency_symbol }}
+                        {% endfor %} {{ payment.credit }}
+                    </td>
                     <td class="p-3 border">
                         {% if payment.status == 'paid' %}
                         <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs">Paid</span>
@@ -57,7 +92,9 @@
                         Total
                     </td>
                     <td class="px-3 py-1 text-right text-gray-500">
-                        {{ total_sum }}
+                        {% for x in hospital %}
+                        {{ x.country.currency_symbol }}
+                        {% endfor %} {{ total_sum }}
                     </td>
                 </tr>
                 </tfoot>

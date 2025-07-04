@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from Home.models import *
 from decimal import Decimal
 from datetime import datetime
-from django.db.models import Sum
+from django.db.models import Q, Sum
 
 
 def generate_payment_ref():
@@ -98,10 +98,30 @@ def create_payment(request, bill_id):
 
 def Payments(request):
     hospital = Hospital.objects.all()
-    payments = Payment.objects.all()
+    payments = Payment.objects.all().order_by('-date')
+
+    search_query = request.GET.get('search')
+    from_date = request.GET.get('from_date')
+    to_date = request.GET.get('to_date')
+
+    if search_query:
+        payments = payments.filter(
+            Q(patient__name__icontains=search_query) |
+            Q(ref__icontains=search_query)
+        )
+
+    if from_date:
+        payments = payments.filter(date__date__gte=from_date)
+    if to_date:
+        payments = payments.filter(date__date__lte=to_date)
+
     total_sum = payments.aggregate(Sum('debit'))['debit__sum'] or 0
+
     return render(request, "payments.html", {
         'payments': payments,
         'hospital': hospital,
         'total_sum': total_sum,
+        'search_query': search_query or '',
+        'from_date': from_date or '',
+        'to_date': to_date or '',
     })

@@ -112,8 +112,33 @@ def patient_pdf_download(request, patient_id):
 def Bills(request):
     hospital = Hospital.objects.all()
     bills = Bill.objects.all().order_by('-date')
+
+    search_query = request.GET.get('search')
+    from_date = request.GET.get('from_date')
+    to_date = request.GET.get('to_date')
+
+    if search_query:
+        bills = bills.filter(
+            Q(patient__name__icontains=search_query) |
+            Q(patient__reference__icontains=search_query)
+        )
+
+    if from_date:
+        bills = bills.filter(patient__datetime__date__gte=from_date)
+
+    if to_date:
+        bills = bills.filter(patient__datetime__date__lte=to_date)
+
     total_sum = bills.aggregate(Sum('amount'))['amount__sum'] or 0
-    return render(request, 'bills.html', {'bills': bills, 'hospital': hospital, 'total_sum': total_sum})
+
+    return render(request, 'bills.html', {
+        'bills': bills,
+        'hospital': hospital,
+        'total_sum': total_sum,
+        'search_query': search_query or '',
+        'from_date': from_date or '',
+        'to_date': to_date or '',
+    })
 
 
 def delete_bill(request, bill_id):

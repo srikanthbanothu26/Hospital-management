@@ -8,7 +8,7 @@
     <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-red-600">Create Bill</h1>
-            <a href="{% url 'bills'%}" class="flex items-center text-blue-600 hover:text-blue-800">
+            <a href="{% url 'bills' %}" class="flex items-center text-blue-600 hover:text-blue-800">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                      stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-1">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -60,14 +60,17 @@
                     <thead class="bg-gray-100">
                     <tr>
                         <th class="p-2 text-left">Product</th>
+                        <th class="p-2 text-left">Qty</th>
                         <th class="p-2 text-left">Amount</th>
+                        <th class="p-2 text-left">Subtotal</th>
                         <th class="p-2 text-center">Actions</th>
                     </tr>
                     </thead>
                     <tbody id="product-lines">
                     <tr>
                         <td class="p-2">
-                            <select name="product[]" class="w-full border px-2 py-1 rounded">
+                            <select name="product[]" class="w-full border px-2 py-1 rounded"
+                                    onchange="updateLine(this)">
                                 {% for product in products %}
                                 <option value="{{ product.id }}" data-amount="{{ product.price }}">
                                     {{ product.name }}
@@ -76,11 +79,17 @@
                             </select>
                         </td>
                         <td class="p-2">
+                            <input type="number" name="qty[]" value="1" min="1" class="w-full border px-2 py-1 rounded"
+                                   onchange="updateLine(this)">
+                        </td>
+                        <td class="p-2">
                             <input type="number" name="amount[]" class="w-full border px-2 py-1 rounded" readonly>
                         </td>
+                        <td class="p-2">
+                            <input type="number" name="subtotal[]" class="w-full border px-2 py-1 rounded" readonly>
+                        </td>
                         <td class="p-2 text-center">
-                            <button type="button" onclick="removeLine(this)" class="text-red-600 font-bold">
-                                &times;
+                            <button type="button" onclick="removeLine(this)" class="text-red-600 font-bold">&times;
                             </button>
                         </td>
                     </tr>
@@ -95,7 +104,7 @@
             <!-- Total Display -->
             <div class="flex justify-end items-center mb-6">
                 <span class="text-lg font-semibold text-gray-700 mr-2">Total:</span>
-                <span id="total-amount" class="text-2xl font-bold text-red-700">0</span>
+                <span id="total-amount" class="text-2xl font-bold text-red-700">0.00</span>
             </div>
 
             <!-- Submit Button -->
@@ -117,27 +126,37 @@
 
 {% block scripts %}
 <script>
-    function updateAmountFromSelect(selectElement) {
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const amount = selectedOption.getAttribute("data-amount") || 0;
-        const amountInput = selectElement.closest('tr').querySelector('input[name="amount[]"]');
-        if (amountInput) {
-            amountInput.value = amount;
+    function updateLine(el) {
+        const row = el.closest('tr');
+        const select = row.querySelector('select[name="product[]"]');
+        const qtyInput = row.querySelector('input[name="qty[]"]');
+        const amountInput = row.querySelector('input[name="amount[]"]');
+        const subtotalInput = row.querySelector('input[name="subtotal[]"]');
+
+        const price = parseFloat(select.selectedOptions[0].getAttribute('data-amount')) || 0;
+        let qty = parseInt(qtyInput.value) || 1;
+
+        if (qty < 1) {
+            qty = 1;
+            qtyInput.value = 1;
         }
+
+        amountInput.value = price.toFixed(2);
+        subtotalInput.value = (qty * price).toFixed(2);
         updateTotal();
     }
 
     function addLine() {
         const tableBody = document.getElementById('product-lines');
-
         const tr = document.createElement('tr');
 
-        // Product select
+        // Product
         const td1 = document.createElement('td');
         td1.className = 'p-2';
         const select = document.createElement('select');
         select.name = 'product[]';
         select.className = 'w-full border px-2 py-1 rounded';
+        select.onchange = function () { updateLine(this); };
 
         {% for product in products %}
         const opt{{ forloop.counter }} = document.createElement('option');
@@ -146,67 +165,78 @@
         opt{{ forloop.counter }}.innerText = '{{ product.name }}';
         select.appendChild(opt{{ forloop.counter }});
         {% endfor %}
-
-        select.addEventListener('change', function () {
-            updateAmountFromSelect(this);
-        });
-
         td1.appendChild(select);
 
-        // Amount input
+        // Qty
         const td2 = document.createElement('td');
         td2.className = 'p-2';
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.name = 'amount[]';
-        input.className = 'w-full border px-2 py-1 rounded';
-        input.readOnly = true;
-        td2.appendChild(input);
+        const qty = document.createElement('input');
+        qty.type = 'number';
+        qty.name = 'qty[]';
+        qty.className = 'w-full border px-2 py-1 rounded';
+        qty.min = '1';
+        qty.value = '1';
+        qty.onchange = function () { updateLine(this); };
+        td2.appendChild(qty);
 
-        // Remove button
+        // Amount
         const td3 = document.createElement('td');
-        td3.className = 'p-2 text-center';
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'text-red-600 font-bold';
-        removeBtn.innerHTML = '&times;';
-        removeBtn.onclick = function () {
-            removeLine(this);
-        };
-        td3.appendChild(removeBtn);
+        td3.className = 'p-2';
+        const amount = document.createElement('input');
+        amount.type = 'number';
+        amount.name = 'amount[]';
+        amount.className = 'w-full border px-2 py-1 rounded';
+        amount.readOnly = true;
+        td3.appendChild(amount);
+
+        // Subtotal
+        const td4 = document.createElement('td');
+        td4.className = 'p-2';
+        const subtotal = document.createElement('input');
+        subtotal.type = 'number';
+        subtotal.name = 'subtotal[]';
+        subtotal.className = 'w-full border px-2 py-1 rounded';
+        subtotal.readOnly = true;
+        td4.appendChild(subtotal);
+
+        // Remove
+        const td5 = document.createElement('td');
+        td5.className = 'p-2 text-center';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'text-red-600 font-bold';
+        btn.innerHTML = '&times;';
+        btn.onclick = function () { removeLine(this); };
+        td5.appendChild(btn);
 
         tr.appendChild(td1);
         tr.appendChild(td2);
         tr.appendChild(td3);
+        tr.appendChild(td4);
+        tr.appendChild(td5);
 
         tableBody.appendChild(tr);
-
-        updateAmountFromSelect(select);
+        updateLine(qty);
     }
 
     function removeLine(btn) {
         const row = btn.closest('tr');
-        const rows = document.querySelectorAll('#product-lines tr');
-        if (rows.length > 0) {
-            row.remove();
-            updateTotal();
-        }
+        row.remove();
+        updateTotal();
     }
 
     function updateTotal() {
         let total = 0;
-        document.querySelectorAll('input[name="amount[]"]').forEach(input => {
-            const value = parseFloat(input.value) || 0;
-            total += value;
+        document.querySelectorAll('input[name="subtotal[]"]').forEach(input => {
+            total += parseFloat(input.value) || 0;
         });
         document.getElementById('total-amount').textContent = total.toFixed(2);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('select[name="product[]"]').forEach(select => {
-            updateAmountFromSelect(select);
-            select.addEventListener('change', function () {
-                updateAmountFromSelect(this);
+        document.querySelectorAll('select[name="product[]"], input[name="qty[]"]').forEach(el => {
+            el.addEventListener('change', function () {
+                updateLine(this);
             });
         });
         updateTotal();
