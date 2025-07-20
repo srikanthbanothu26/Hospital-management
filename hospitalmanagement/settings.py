@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [
     "historical-clownfish-srkm-b43b1f51.koyeb.app",
     "127.0.0.1",
     "localhost",
+    "hospital-management-z947.onrender.com",
 ]
 
 # Application definition
